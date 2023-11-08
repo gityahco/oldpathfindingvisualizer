@@ -8,7 +8,7 @@
 }
 
 body {
-  background-color: #444;
+  background-color: #463939;
 }
 
 .App {
@@ -21,13 +21,13 @@ body {
 .Header {
   display: flex;
 }
-.grid-header {
+/* .grid-header {
   background-color: rgb(129, 116, 116);
   display: flex;
   border-top: 5px solid var(--BORDER-COLOR);
   border-right: 5px solid var(--BORDER-COLOR);
   border-left: 5px solid var(--BORDER-COLOR);
-}
+} */
 .start-algo {
   background-color: brown;
   padding: 9px;
@@ -40,16 +40,13 @@ body {
   grid-template-rows: repeat(20, auto);
   gap: 1px;
   background-color: var(--BORDER-COLOR);
-  border: 5px solid var(--BORDER-COLOR);
+  border: 1px solid var(--BORDER-COLOR);
 }
 
 .grid-container > div {
   aspect-ratio: 1;
 }
-/* .menu-button-start {
-  background-color: "rgb(19, 107, 19)";
-} */
-.Menu-buttons > button{
+.menu-button-end {
   background-color: lightblue;
   padding: 4px;
   margin: 4px;

@@ -83,7 +83,7 @@ Cell.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
   selectedCellType: PropTypes.string,
-  generateCellClassName: PropTypes.func,
+  generateCellClassName: PropTypes.func.isRequired,
   cellPosition: PropTypes.string.isRequired,
   cellType: PropTypes.shape({
     start: PropTypes.string,
@@ -93,7 +93,5 @@ Cell.propTypes = {
     explored: PropTypes.arrayOf(PropTypes.string),
     uncovered: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
-  setCellType: PropTypes.func,
-  isPath: PropTypes.bool,
-  isExplored: PropTypes.bool,
+  setCellType: PropTypes.func.isRequired,
 };

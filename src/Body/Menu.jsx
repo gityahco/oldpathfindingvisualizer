@@ -9,14 +9,13 @@ const menuOptions = [
   { label: "checkpoint", value: "checkpoint" },
 ];
 
-export default function Menu({ handleCellTypeChange }) {
-
+export default function Menu({ handleCellTypeChange, dijkstra }) {
   const handleButtonClick = (option) => {
     handleCellTypeChange(option);
   };
 
   return (
-    <div className="Menu-buttons">
+    <div>
       {menuOptions.map((option) => (
         <button
           key={option.value}
@@ -26,11 +25,14 @@ export default function Menu({ handleCellTypeChange }) {
           {option.label}
         </button>
       ))}
-      {/* <button onClick={}>start Algo</button> */}
+      <button onClick={dijkstra} className="start-algo">
+        start Algo
+      </button>
     </div>
   );
 }
 
 Menu.propTypes = {
   handleCellTypeChange: PropTypes.func.isRequired,
+  dijkstra: PropTypes.func,
 };
