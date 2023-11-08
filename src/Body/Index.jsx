@@ -5,6 +5,8 @@ import Menu from "./Menu";
 const COLUMNS = 50;
 const ROWS = 20;
 function Index() {
+  const [isRunning, setIsRunning] = useState(true);
+
   const [cellType, setCellType] = useState({
     start: null,
     end: null,
@@ -13,41 +15,36 @@ function Index() {
     explored: [],
     uncovered: [],
   });
-  const getNeighbors = useCallback(
-    (row, col) => {
-      const neighbors = [];
 
-      // Check the top neighbor
-      if (row > 0 && !cellType.wall.includes(`${row - 1}-${col}`)) {
-        neighbors.push([row - 1, col]);
+  const getNeighbors = useCallback((row, col) => {
+    const neighbors = [];
+
+    const checkNeighbor = (row, col) => {
+      if (
+        row >= 0 &&
+        row < ROWS &&
+        col >= 0 &&
+        col < COLUMNS &&
+        !cellType.wall.includes(`${row}-${col}`)
+      ) {
+        neighbors.push([row, col]);
       }
+    };
 
-      // Check the right neighbor
-      if (col < COLUMNS - 1 && !cellType.wall.includes(`${row}-${col + 1}`)) {
-        neighbors.push([row, col + 1]);
-      }
+    checkNeighbor(row - 1, col); // Top neighbor
+    checkNeighbor(row, col + 1); // Right neighbor
+    checkNeighbor(row + 1, col); // Bottom neighbor
+    checkNeighbor(row, col - 1); // Left neighbor
 
-      // Check the bottom neighbor
-      if (row < ROWS - 1 && !cellType.wall.includes(`${row + 1}-${col}`)) {
-        neighbors.push([row + 1, col]);
-      }
+    return neighbors;
+  }, [cellType.wall]);
 
-      // Check the left neighbor
-      if (col > 0 && !cellType.wall.includes(`${row}-${col - 1}`)) {
-        neighbors.push([row, col - 1]);
-      }
-
-      return neighbors;
-    },
-    [cellType.wall]
-  );
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const dijkstra = useCallback(async () => {
-    const distances = [];
-    for (let i = 0; i < ROWS; i++) {
-      distances[i] = new Array(COLUMNS).fill(Infinity);
-    }
+    const distances = Array.from({ length: ROWS }, () =>
+      Array(COLUMNS).fill(Infinity)
+    );
 
     const [startRow, startCol] = cellType.start.split("-").map(Number);
 
@@ -69,11 +66,10 @@ function Index() {
         ...prev,
         explored: prev.explored.concat(`${currentRow}-${currentCol}`),
       }));
-      // Path setting
-      // if (cellType.end === `${currentRow}-${currentCol}`) {
+
       const neighbors = getNeighbors(currentRow, currentCol);
       for (const [neighborRow, neighborCol] of neighbors) {
-        if (!cellType.explored.includes(`${neighborRow}-${neighborCol}`)) {
+        if (!cellType.explored.includes(`${currentRow}-${currentCol}`)) {
           setCellType((prev) => ({
             ...prev,
             uncovered: prev.uncovered.concat(`${neighborRow}-${neighborCol}`),
@@ -81,18 +77,13 @@ function Index() {
         }
         const newDistance = distance + 1;
 
-        if (cellType.end === `${neighborRow}-${neighborCol}`) {
+        if (cellType.end === `${currentRow}-${currentCol}`) {
           const path = [];
           let row = currentRow;
           let col = currentCol;
 
           while (!(row === startRow && col === startCol)) {
             path.unshift(`${row}-${col}`);
-
-            // setCellType((prev) => ({ ...prev, path: path }));
-            setCellType((prev) => ({ ...prev, path: prev.path.concat(path) }));
-            await delay(10);
-
             const neighbors = getNeighbors(row, col);
             let minDistance = Infinity;
             let nextRow = row;
@@ -105,23 +96,16 @@ function Index() {
                 nextCol = neighborCol;
               }
             }
-
             row = nextRow;
             col = nextCol;
           }
-
+          while (path.length > 0) {
+            const pathed = path.shift()
+            setCellType((prev) => ({ ...prev, path: prev.path.concat(`${pathed}`) }));
+            await delay(10);
+          }
           return;
         }
-
-        // const neighbors = getNeighbors(currentRow, currentCol);
-        // for (const [neighborRow, neighborCol] of neighbors) {
-        //   if (!cellType.explored.includes(`${neighborRow}-${neighborCol}`)) {
-        //     setCellType((prev) => ({
-        //       ...prev,
-        //       uncovered: prev.uncovered.concat(`${neighborRow}-${neighborCol}`)
-        //     }));
-        //   }
-        //   const newDistance = distance + 1;
 
         if (newDistance < distances[neighborRow][neighborCol]) {
           distances[neighborRow][neighborCol] = newDistance;
@@ -129,9 +113,13 @@ function Index() {
         }
       }
     }
-  }, [cellType.end, cellType.explored, cellType.start, getNeighbors, setCellType]);
-
-
+  }, [
+    cellType.end,
+    cellType.explored,
+    cellType.start,
+    getNeighbors,
+    isRunning,
+  ]);
 
   const [selectedCellType, setSelectedCellType] = useState(null);
 
@@ -149,9 +137,81 @@ function Index() {
       return memoizedClassName[position];
     };
   }, []);
+
+  const handleStart = useCallback(() => {
+    setIsRunning(true);
+    dijkstra();
+  }, [dijkstra]);
+
+  const handleStop = useCallback(() => {
+    setIsRunning(false);
+  }, []);
+
+  const generateRandomMaze = useCallback(() => {
+    // Create a grid with all walls
+    const maze = Array.from({ length: ROWS }, () =>
+      Array(COLUMNS).fill(true)
+    );
+
+    // Helper function to carve paths in the maze
+    function carvePath(row, col) {
+      maze[row][col] = false; // Remove the wall at the current position
+
+      // Define the possible directions to move
+      const directions = [
+        { row: -2, col: 0 }, // Up
+        { row: 2, col: 0 }, // Down
+        { row: 0, col: -2 }, // Left
+        { row: 0, col: 2 }, // Right
+      ];
+
+      // Randomize the order of directions
+      directions.sort(() => Math.random() - 0.5);
+
+      // Iterate through each direction
+      for (const direction of directions) {
+        const newRow = row + direction.row;
+        const newCol = col + direction.col;
+
+        // Check if the new position is within the maze boundaries
+        if (
+          newRow >= 0 &&
+          newRow < ROWS &&
+          newCol >= 0 &&
+          newCol < COLUMNS &&
+          maze[newRow][newCol]
+        ) {
+          // Carve a path by removing the wall between the current and new positions
+          maze[row + direction.row / 2][col + direction.col / 2] = false;
+          carvePath(newRow, newCol);
+        }
+      }
+    }
+
+    // Start carving paths from a random position
+    const startRow = Math.floor(Math.random() * ROWS);
+    const startCol = Math.floor(Math.random() * COLUMNS);
+    carvePath(startRow, startCol);
+
+    // Update the cellType state to reflect the generated maze
+    setCellType((prev) => ({
+      ...prev,
+      wall: maze.map((row, rowIndex) =>
+        row.map((isWall, colIndex) => (isWall ? `${rowIndex}-${colIndex}` : null))
+      ).flat().filter(Boolean),
+    }));
+  }, []);
+
   return (
-    <>
-      <Menu handleCellTypeChange={handleCellTypeChange} dijkstra={dijkstra}/>
+    <div className="Index">
+      <Menu
+        handleCellTypeChange={handleCellTypeChange}
+        dijkstra={dijkstra}
+        cellType={cellType}
+        generateRandomMaze={generateRandomMaze}
+      />
+      {/* <button onClick={handleStart}>Start</button>
+      <button onClick={handleStop}>Stop</button> */}
       <Grid
         selectedCellType={selectedCellType}
         ROWS={ROWS}
@@ -162,7 +222,7 @@ function Index() {
         getNeighbors={getNeighbors}
         dijkstra={dijkstra}
       />
-    </>
+    </div>
   );
 }
 

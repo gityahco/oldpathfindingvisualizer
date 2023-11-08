@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo , useState} from "react";
 import PropTypes from "prop-types";
 
 export default function Cell({
@@ -8,9 +8,9 @@ export default function Cell({
   cellType,
   setCellType,
   selectedCellType,
-  generateCellClassName
+  generateCellClassName,
 }) {
-
+  const [isAnimating, setIsAnimating] = useState(false);
   const handleCellClick = useCallback(
     (row, col) => {
       const cellPosition = generateCellClassName(row, col);
@@ -23,60 +23,146 @@ export default function Cell({
           (position) => position !== cellPosition
         ),
       });
+      switch (selectedCellType) {
+        case "start":
+          setCellType((prevPositions) => ({
+            ...updatePositions(prevPositions),
+            start: cellPosition,
+          }));
+          setIsAnimating(true)
+          break;
+        case "end":
+          setCellType((prevPositions) => ({
+            ...updatePositions(prevPositions),
+            end: cellPosition,
+          }));
+          break;
+        case "wall":
+          setCellType((prevPositions) => ({
+            ...updatePositions(prevPositions),
+            wall: prevPositions.wall.includes(cellPosition)
+              ? prevPositions.wall.filter((position) => position !== cellPosition)
+              : [...prevPositions.wall, cellPosition],
+          }));
+          break;
+        case "empty":
+          setCellType((prevPositions) => updatePositions(prevPositions));
+          break;
+        default:
+          if (!cellType.start) {
+            setCellType((prevPositions) => ({
+              ...updatePositions(prevPositions),
+              start: cellPosition,
+            }));
+          setIsAnimating(true)
 
-      if (selectedCellType === "start") {
-        setCellType((prevPositions) => ({
-          ...updatePositions(prevPositions),
-          start: cellPosition,
-        }));
-      } else if (selectedCellType === "end") {
-        setCellType((prevPositions) => ({
-          ...updatePositions(prevPositions),
-          end: cellPosition,
-        }));
-      } else if (selectedCellType === "wall") {
-        setCellType((prevPositions) => ({
-          ...updatePositions(prevPositions),
-          wall: prevPositions.wall.includes(cellPosition)
-            ? prevPositions.wall.filter((position) => position !== cellPosition)
-            : [...prevPositions.wall, cellPosition],
-        }));
-      } else if (selectedCellType === "empty") {
-        setCellType((prevPositions) => updatePositions(prevPositions));
+          } else if (!cellType.end) {
+            setCellType((prevPositions) => ({
+              ...updatePositions(prevPositions),
+              end: cellPosition,
+            }));
+          } else {
+            setCellType((prevPositions) => ({
+              ...updatePositions(prevPositions),
+              wall: prevPositions.wall.includes(cellPosition)
+                ? prevPositions.wall.filter((position) => position !== cellPosition)
+                : [...prevPositions.wall, cellPosition],
+            }));
+          }
+          break;
       }
+
     },
-    [generateCellClassName, selectedCellType, setCellType]
+    [
+      cellType.end,
+      cellType.start,
+      generateCellClassName,
+      selectedCellType,
+      setCellType,
+    ]
   );
+  const isStart = cellPosition === cellType.start;
+  const isEnd = cellPosition === cellType.end;
+  const isWall = cellType.wall.includes(cellPosition);
+  const isPath = cellType.path.includes(cellPosition);
+  const isExplored = cellType.explored.includes(cellPosition);
+  const isUncovered = cellType.uncovered.includes(cellPosition);
+
   const cellStyle = useMemo(() => {
-    const isStart = cellPosition === cellType.start;
-    const isEnd = cellPosition === cellType.end;
-    const isWall = cellType.wall.includes(cellPosition);
-    const isPath = cellType.path.includes(cellPosition);
-    const isExplored = cellType.explored.includes(cellPosition);
-    const isUncovered = cellType.uncovered.includes(cellPosition)
     return {
+      // transform: isStart && isAnimating ? "scale(1.2)" : "scale(1)",
+      // transition: "transform 0.3s ease-in-out",
       backgroundColor: isStart
-        ? "rgb(19, 107, 19)"
+        ? // ? "rgb(19, 107, 19)"
+          // ? "rgb(0, 120, 255)"
+          "transparent"
         : isEnd
-        ? "hsl(357, 100%, 67%)"
-        : isWall
-        ? "rgb(255, 187, 0)"
+        ? // ? "hsl(357, 100%, 67%)"
+          // "rgb(150, 0, 255)"
+          "darkblue"
+        : // "transparent"
+        isWall
+        ? // ? "rgb(255, 187, 0)"
+          "rgb(80, 80, 80)"
         : isPath
-        ? "hsl(219, 100%, 67%)"
+        ? // ? "hsl(219, 100%, 67%)"
+          "rgb(255, 255, 0)"
         : isExplored
-        ? "rgb(0, 100, 100)"
+        ? // ? "rgb(0, 100, 100)"
+          "rgb(100, 157, 176)"
         : isUncovered
-        ? 'rgb(169, 51, 8)'
-        : "hsl(50, 50%, 50%)",
+        ? // ? 'rgb(169, 51, 8)'
+          "rgb(0, 150, 0)"
+        : // : "hsl(50, 50%, 50%)",
+          // "rgb(220, 220, 220)",
+          "whitesmoke",
+
     };
-  }, [cellPosition, cellType.start, cellType.end, cellType.wall, cellType.path, cellType.explored, cellType.uncovered]);
+  }, [isStart, isEnd, isWall, isPath, isExplored, isUncovered, isAnimating]);
   return (
     <div
       key={cellPosition}
       className={cellPosition}
       style={cellStyle}
       onClick={() => handleCellClick(row, col)}
-    ></div>
+    >
+      {isStart && (
+        <svg
+          viewBox="-2.4 -2.4 28.80 28.80"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          transform="matrix(1, 0, 0, 1, 0, 0)rotate(0)"
+          style={{ display: "block" }}
+        >
+          <g id="SVGRepo_bgCarrier" strokeWidth="0">
+            <rect
+              x="-2.4"
+              y="-2.4"
+              width="28.80"
+              height="28.80"
+              rx="0"
+              fill="#7ed0ec"
+              strokeWidth="0"
+            ></rect>
+          </g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            {" "}
+            <path
+              d="M6 12H18M18 12L13 7M18 12L13 17"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></path>{" "}
+          </g>
+        </svg>
+      )}
+    </div>
   );
 }
 Cell.propTypes = {

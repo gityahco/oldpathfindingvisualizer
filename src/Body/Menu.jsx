@@ -1,15 +1,15 @@
 import PropTypes from "prop-types";
 
 const menuOptions = [
-  { label: "start", value: "start" },
-  { label: "end", value: "end" },
-  { label: "wall", value: "wall" },
-  { label: "empty", value: "empty" },
-  { label: "bomb", value: "bomb" },
-  { label: "checkpoint", value: "checkpoint" },
+  { label: "Start", value: "start" },
+  { label: "End", value: "end" },
+  { label: "Wall", value: "wall" },
+  { label: "Empty", value: "empty" },
+  { label: "Bomb", value: "bomb" },
+  { label: "Checkpoint", value: "checkpoint" },
 ];
 
-export default function Menu({ handleCellTypeChange, dijkstra }) {
+export default function Menu({ handleCellTypeChange, dijkstra, cellType, generateRandomMaze}) {
   const handleButtonClick = (option) => {
     handleCellTypeChange(option);
   };
@@ -25,8 +25,21 @@ export default function Menu({ handleCellTypeChange, dijkstra }) {
           {option.label}
         </button>
       ))}
-      <button onClick={dijkstra} className="start-algo">
-        start Algo
+  <button onClick={generateRandomMaze} className="gen-maze">Generate Maze</button>
+
+      <button
+        onClick={() => {
+          if (!cellType.start) {
+            alert("Please set a start point");
+          } else if (!cellType.end) {
+            alert("Please set an end point");
+          } else {
+            dijkstra();
+          }
+        }}
+        className="start-algo"
+      >
+        Start Algo
       </button>
     </div>
   );
@@ -35,4 +48,8 @@ export default function Menu({ handleCellTypeChange, dijkstra }) {
 Menu.propTypes = {
   handleCellTypeChange: PropTypes.func.isRequired,
   dijkstra: PropTypes.func,
+  cellType: PropTypes.shape({
+    start: PropTypes.string,
+    end: PropTypes.string,
+  }).isRequired,
 };
