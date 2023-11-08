@@ -5,7 +5,7 @@ import Menu from "./Menu";
 const COLUMNS = 50;
 const ROWS = 20;
 function Index() {
-  const [isRunning, setIsRunning] = useState(true);
+  // const [isRunning, setIsRunning] = useState(true);
 
   const [cellType, setCellType] = useState({
     start: null,
@@ -113,13 +113,7 @@ function Index() {
         }
       }
     }
-  }, [
-    cellType.end,
-    cellType.explored,
-    cellType.start,
-    getNeighbors,
-    isRunning,
-  ]);
+  }, [cellType.end, cellType.explored, cellType.start, getNeighbors]);
 
   const [selectedCellType, setSelectedCellType] = useState(null);
 
@@ -138,14 +132,14 @@ function Index() {
     };
   }, []);
 
-  const handleStart = useCallback(() => {
-    setIsRunning(true);
-    dijkstra();
-  }, [dijkstra]);
+  // const handleStart = useCallback(() => {
+  //   setIsRunning(true);
+  //   dijkstra();
+  // }, [dijkstra]);
 
-  const handleStop = useCallback(() => {
-    setIsRunning(false);
-  }, []);
+  // const handleStop = useCallback(() => {
+  //   setIsRunning(false);
+  // }, []);
 
   const generateRandomMaze = useCallback(() => {
     // Create a grid with all walls

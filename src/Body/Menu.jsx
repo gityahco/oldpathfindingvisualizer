@@ -47,6 +47,7 @@ export default function Menu({ handleCellTypeChange, dijkstra, cellType, generat
 
 Menu.propTypes = {
   handleCellTypeChange: PropTypes.func.isRequired,
+  generateRandomMaze: PropTypes.func.isRequired,
   dijkstra: PropTypes.func,
   cellType: PropTypes.shape({
     start: PropTypes.string,

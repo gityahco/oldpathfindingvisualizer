@@ -10,7 +10,7 @@ export default function Cell({
   selectedCellType,
   generateCellClassName,
 }) {
-  const [isAnimating, setIsAnimating] = useState(false);
+  // const [isAnimating, setIsAnimating] = useState(false);
   const handleCellClick = useCallback(
     (row, col) => {
       const cellPosition = generateCellClassName(row, col);
@@ -29,7 +29,7 @@ export default function Cell({
             ...updatePositions(prevPositions),
             start: cellPosition,
           }));
-          setIsAnimating(true)
+          // setIsAnimating(true)
           break;
         case "end":
           setCellType((prevPositions) => ({
@@ -54,7 +54,7 @@ export default function Cell({
               ...updatePositions(prevPositions),
               start: cellPosition,
             }));
-          setIsAnimating(true)
+          // setIsAnimating(true)
 
           } else if (!cellType.end) {
             setCellType((prevPositions) => ({
@@ -118,7 +118,7 @@ export default function Cell({
           "whitesmoke",
 
     };
-  }, [isStart, isEnd, isWall, isPath, isExplored, isUncovered, isAnimating]);
+  }, [isStart, isEnd, isWall, isPath, isExplored, isUncovered]);
   return (
     <div
       key={cellPosition}
