@@ -3,19 +3,15 @@
   margin: 0;
   box-sizing: border-box;
 }
-:root {
-  /* --BORDER-COLOR: hsl(0, 4%, 18%) */
-  /* --BORDER-COLOR: rgb(220, 220, 220) */
-  --BORDER-COLOR: darkgray
-}
 
 body {
-  background-color: darkgray;
+  background-color: rgb(29, 29, 29);
 }
-.sth {
-  background-color: rgb(100, 157, 176);
+.title-header {
+  display: flex;
+  justify-content: center;
+  background-color: azure;
 }
-
 .App {
   position: absolute;
   left: 1%;
@@ -24,6 +20,27 @@ body {
   bottom: 1%;
 }
 
+#board-cell {
+  background-color: wheat;
+}
+#start-cell {
+  background-color: transparent;
+}
+#end-cell {
+  background-color: rgb(4, 255, 0);
+}
+#wall-cell {
+  background-color: rgb(80, 80, 80)
+}
+#path-cell {
+background-color: rgb(255, 255, 0);
+}
+#explored-cell {
+background-color: rgb(100, 157, 176);
+}
+#ahead-cell {
+background-color: rgb(0, 150, 0);
+}
 .grid-container {
   display: grid;
   grid-template-columns: repeat(50, auto);

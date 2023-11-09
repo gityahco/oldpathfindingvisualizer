@@ -1,4 +1,4 @@
-import { useCallback, useMemo , useState} from "react";
+import { useCallback } from "react";
 import PropTypes from "prop-types";
 
 export default function Cell({
@@ -10,7 +10,6 @@ export default function Cell({
   selectedCellType,
   generateCellClassName,
 }) {
-  // const [isAnimating, setIsAnimating] = useState(false);
   const handleCellClick = useCallback(
     (row, col) => {
       const cellPosition = generateCellClassName(row, col);
@@ -29,7 +28,6 @@ export default function Cell({
             ...updatePositions(prevPositions),
             start: cellPosition,
           }));
-          // setIsAnimating(true)
           break;
         case "end":
           setCellType((prevPositions) => ({
@@ -86,44 +84,13 @@ export default function Cell({
   const isWall = cellType.wall.includes(cellPosition);
   const isPath = cellType.path.includes(cellPosition);
   const isExplored = cellType.explored.includes(cellPosition);
-  const isUncovered = cellType.uncovered.includes(cellPosition);
+  const isAhead = cellType.uncovered.includes(cellPosition);
 
-  const cellStyle = useMemo(() => {
-    return {
-      // transform: isStart && isAnimating ? "scale(1.2)" : "scale(1)",
-      // transition: "transform 0.3s ease-in-out",
-      backgroundColor: isStart
-        ? // ? "rgb(19, 107, 19)"
-          // ? "rgb(0, 120, 255)"
-          "transparent"
-        : isEnd
-        ? // ? "hsl(357, 100%, 67%)"
-          // "rgb(150, 0, 255)"
-          "darkblue"
-        : // "transparent"
-        isWall
-        ? // ? "rgb(255, 187, 0)"
-          "rgb(80, 80, 80)"
-        : isPath
-        ? // ? "hsl(219, 100%, 67%)"
-          "rgb(255, 255, 0)"
-        : isExplored
-        ? // ? "rgb(0, 100, 100)"
-          "rgb(100, 157, 176)"
-        : isUncovered
-        ? // ? 'rgb(169, 51, 8)'
-          "rgb(0, 150, 0)"
-        : // : "hsl(50, 50%, 50%)",
-          // "rgb(220, 220, 220)",
-          "whitesmoke",
-
-    };
-  }, [isStart, isEnd, isWall, isPath, isExplored, isUncovered]);
   return (
     <div
       key={cellPosition}
       className={cellPosition}
-      style={cellStyle}
+      id={isStart ? 'start-cell' : isEnd ? 'end-cell' : isWall ? 'wall-cell' : isPath ? 'path-cell' : isExplored ? 'explored-cell' : isAhead ? 'ahead-cell' : 'board-cell'}
       onClick={() => handleCellClick(row, col)}
     >
       {isStart && (
@@ -141,7 +108,8 @@ export default function Cell({
               width="28.80"
               height="28.80"
               rx="0"
-              fill="#7ed0ec"
+              // fill="#7ed0ec"
+              fill="red"
               strokeWidth="0"
             ></rect>
           </g>

@@ -132,16 +132,7 @@ function Index() {
     };
   }, []);
 
-  // const handleStart = useCallback(() => {
-  //   setIsRunning(true);
-  //   dijkstra();
-  // }, [dijkstra]);
-
-  // const handleStop = useCallback(() => {
-  //   setIsRunning(false);
-  // }, []);
-
-  const generateRandomMaze = useCallback(() => {
+  const generateRandomMaze = useCallback( async () => {
     // Create a grid with all walls
     const maze = Array.from({ length: ROWS }, () =>
       Array(COLUMNS).fill(true)
