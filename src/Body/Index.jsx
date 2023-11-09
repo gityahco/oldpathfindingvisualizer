@@ -16,28 +16,31 @@ function Index() {
     uncovered: [],
   });
 
-  const getNeighbors = useCallback((row, col) => {
-    const neighbors = [];
+  const getNeighbors = useCallback(
+    (row, col) => {
+      const neighbors = [];
 
-    const checkNeighbor = (row, col) => {
-      if (
-        row >= 0 &&
-        row < ROWS &&
-        col >= 0 &&
-        col < COLUMNS &&
-        !cellType.wall.includes(`${row}-${col}`)
-      ) {
-        neighbors.push([row, col]);
-      }
-    };
+      const checkNeighbor = (row, col) => {
+        if (
+          row >= 0 &&
+          row < ROWS &&
+          col >= 0 &&
+          col < COLUMNS &&
+          !cellType.wall.includes(`${row}-${col}`)
+        ) {
+          neighbors.push([row, col]);
+        }
+      };
 
-    checkNeighbor(row - 1, col); // Top neighbor
-    checkNeighbor(row, col + 1); // Right neighbor
-    checkNeighbor(row + 1, col); // Bottom neighbor
-    checkNeighbor(row, col - 1); // Left neighbor
+      checkNeighbor(row - 1, col); // Top neighbor
+      checkNeighbor(row, col + 1); // Right neighbor
+      checkNeighbor(row + 1, col); // Bottom neighbor
+      checkNeighbor(row, col - 1); // Left neighbor
 
-    return neighbors;
-  }, [cellType.wall]);
+      return neighbors;
+    },
+    [cellType.wall]
+  );
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -100,8 +103,11 @@ function Index() {
             col = nextCol;
           }
           while (path.length > 0) {
-            const pathed = path.shift()
-            setCellType((prev) => ({ ...prev, path: prev.path.concat(`${pathed}`) }));
+            const pathed = path.shift();
+            setCellType((prev) => ({
+              ...prev,
+              path: prev.path.concat(`${pathed}`),
+            }));
             await delay(10);
           }
           return;
@@ -131,12 +137,20 @@ function Index() {
       return memoizedClassName[position];
     };
   }, []);
-
-  const generateRandomMaze = useCallback( async () => {
+  const clearTheBoard = () => {
+    setCellType((prev) => ({
+      ...prev,
+      start: null,
+      end: null,
+      wall: [],
+      explored: [],
+      path: [],
+      uncovered: [],
+    }));
+  };
+  const generateRandomMaze = useCallback(async () => {
     // Create a grid with all walls
-    const maze = Array.from({ length: ROWS }, () =>
-      Array(COLUMNS).fill(true)
-    );
+    const maze = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(true));
 
     // Helper function to carve paths in the maze
     function carvePath(row, col) {
@@ -181,9 +195,14 @@ function Index() {
     // Update the cellType state to reflect the generated maze
     setCellType((prev) => ({
       ...prev,
-      wall: maze.map((row, rowIndex) =>
-        row.map((isWall, colIndex) => (isWall ? `${rowIndex}-${colIndex}` : null))
-      ).flat().filter(Boolean),
+      wall: maze
+        .map((row, rowIndex) =>
+          row.map((isWall, colIndex) =>
+            isWall ? `${rowIndex}-${colIndex}` : null
+          )
+        )
+        .flat()
+        .filter(Boolean),
     }));
   }, []);
 
@@ -194,6 +213,7 @@ function Index() {
         dijkstra={dijkstra}
         cellType={cellType}
         generateRandomMaze={generateRandomMaze}
+        clearTheBoard={clearTheBoard}
       />
       {/* <button onClick={handleStart}>Start</button>
       <button onClick={handleStop}>Stop</button> */}

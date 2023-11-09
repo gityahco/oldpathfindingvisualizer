@@ -9,7 +9,13 @@ const menuOptions = [
   // { label: "Checkpoint", value: "checkpoint" },
 ];
 
-export default function Menu({ handleCellTypeChange, dijkstra, cellType, generateRandomMaze}) {
+export default function Menu({
+  handleCellTypeChange,
+  dijkstra,
+  cellType,
+  generateRandomMaze,
+  clearTheBoard
+}) {
   const handleButtonClick = (option) => {
     handleCellTypeChange(option);
   };
@@ -25,8 +31,12 @@ export default function Menu({ handleCellTypeChange, dijkstra, cellType, generat
           {option.label}
         </button>
       ))}
-  <button onClick={generateRandomMaze} className="gen-maze">Generate Maze</button>
-
+      <button onClick={generateRandomMaze} className="gen-maze">
+        Generate Maze
+      </button>
+      <button onClick={clearTheBoard} className="clear-the-board">
+        Clear The Board
+      </button>
       <button
         onClick={() => {
           if (!cellType.start) {
@@ -48,6 +58,7 @@ export default function Menu({ handleCellTypeChange, dijkstra, cellType, generat
 Menu.propTypes = {
   handleCellTypeChange: PropTypes.func.isRequired,
   generateRandomMaze: PropTypes.func.isRequired,
+  clearTheBoard: PropTypes.func.isRequired,
   dijkstra: PropTypes.func,
   cellType: PropTypes.shape({
     start: PropTypes.string,
